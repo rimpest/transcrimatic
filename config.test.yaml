@@ -1,0 +1,95 @@
+# Test Configuration for TranscriMatic Transcription Engine
+# This configuration is optimized for testing with minimal resources
+
+# Device and storage settings
+device:
+  identifier: "test_device"
+  name: "test_device"
+  mount_path: "/tmp/transcrimatic_test"
+  check_interval: 30
+  
+# Required paths
+paths:
+  audio_destination: "/tmp/transcrimatic_test/audio"
+  transcriptions: "/tmp/transcrimatic_test/transcriptions"
+  summaries: "/tmp/transcrimatic_test/summaries"
+
+# File transfer settings  
+transfer:
+  source_extensions: [".wav", ".mp3", ".m4a"]
+  destination_directory: "/tmp/transcrimatic_test/output"
+  delete_after_transfer: false
+  
+# Audio processing settings
+processing:
+  # Whisper model settings
+  whisper_model: "base"  # Use 'base' for testing (faster), 'large-v3' for production
+  whisper_device: "cpu"  # Use 'cpu' for testing, 'cuda' if GPU available
+  language: "es"
+  
+  # Faster-whisper configuration
+  faster_whisper:
+    beam_size: 3        # Reduced for testing (production: 5)
+    best_of: 3          # Reduced for testing (production: 5)
+    patience: 1.0
+    length_penalty: 1.0
+    temperature: 0.0
+    compression_ratio_threshold: 2.4
+    log_prob_threshold: -1.0
+    no_speech_threshold: 0.6
+    condition_on_previous_text: true
+    vad_filter: true
+    vad_options:
+      min_silence_duration_ms: 500
+      speech_pad_ms: 200
+    
+  # Speaker diarization settings
+  diarization:
+    enabled: false       # Disable for basic testing (requires HF token)
+    min_speakers: 1
+    max_speakers: 10
+    min_duration: 0.5
+    
+  # Post-processing settings
+  post_processing:
+    fix_punctuation: true
+    spell_check: false
+    custom_vocabulary: ["TranscriMatic", "API", "COVID"]
+    
+  # Audio processing settings
+  audio:
+    target_sample_rate: 16000
+    target_channels: 1
+    chunk_duration: 300  # 5 minutes
+    overlap_duration: 1
+    normalize: true
+    noise_reduction: true
+    
+  # Batch processing
+  batch:
+    max_workers: 1       # Single thread for testing
+    save_intermediate: true
+    
+# Output settings
+output:
+  format: "json"
+  include_timestamps: true
+  include_confidence: true
+  transcriptions_dir: "/tmp/transcrimatic_test/transcriptions"
+  
+# LLM settings (not needed for transcription testing)
+llm:
+  provider: "ollama"
+  model: "llama2"
+  api_url: "http://localhost:11434"
+  
+# Logging settings
+logging:
+  level: "DEBUG"        # Verbose for testing
+  file: "/tmp/transcrimatic_test/logs/transcrimatic.log"
+  max_size: "10MB"
+  backup_count: 3
+  
+# PyAnnote settings (only if testing diarization)
+pyannote:
+  auth_token: "YOUR_HUGGINGFACE_TOKEN_HERE"  # Replace with actual token

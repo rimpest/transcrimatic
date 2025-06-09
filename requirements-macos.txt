@@ -1,0 +1,5 @@
+# macOS-specific requirements
+# Install these in addition to requirements.txt on macOS
+
+pyobjc-framework-DiskArbitration>=9.0
+pyobjc-framework-CoreServices>=9.0

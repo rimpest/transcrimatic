@@ -1,0 +1,141 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+*.log
+
+# Audio files (large files)
+*.mp3
+*.wav
+*.m4a
+*.flac
+*.ogg
+*.aac
+*.wma
+*.opus
+
+# Video files
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.webm
+
+# Output directories
+output/
+test_outputs/
+logs/
+temp/
+tmp/
+
+# Personal/Example files
+personal_samples/
+examples/output_demo/
+sample_audio/
+test_audio/
+
+# Configuration files with sensitive data
+config.yaml
+config.json
+*.secret
+*.private
+.env
+
+# Keep example configs
+!config.example.yaml
+!config.test.yaml
+!config.diarization.yaml
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+.directory
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Cache
+.cache/
+*.cache
+
+# Model files (large)
+*.pt
+*.pth
+*.onnx
+*.bin
+*.h5
+*.pkl
+*.pickle
+*.model
+
+# Transcription outputs (can be regenerated)
+transcriptions/
+summaries/
+analyses/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+
+# Lock files
+*.lock
+package-lock.json
+poetry.lock
+Pipfile.lock

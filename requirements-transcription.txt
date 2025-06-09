@@ -1,0 +1,35 @@
+# TranscriMatic Transcription Engine Requirements
+# Install with: pip install -r requirements-transcription.txt
+
+# Core transcription dependencies
+faster-whisper==1.0.3
+pyannote.audio==3.1.1
+
+# PyTorch (CPU version - for GPU, install from https://pytorch.org)
+torch>=2.0.0
+torchaudio>=2.0.0
+
+# Supporting libraries
+numpy>=1.24.0
+onnxruntime>=1.16.0
+librosa>=0.10.0
+soundfile>=0.12.1
+
+# For audio processing
+pydub>=0.25.1
+
+# Configuration
+PyYAML>=6.0
+
+# Testing
+pytest>=7.4.0
+pytest-mock>=3.11.1
+pytest-asyncio>=0.21.1
+
+# Optional: For development
+ipython>=8.12.0
+jupyter>=1.0.0
+
+# Optional: For generating test audio
+gtts>=2.3.0  # Google Text-to-Speech
+pyttsx3>=2.90  # Offline TTS (alternative)
