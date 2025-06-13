@@ -43,7 +43,7 @@ class ConversationBoundary:
         """Validate boundary data."""
         if not 0.0 <= self.confidence <= 1.0:
             raise ValueError("Confidence must be between 0.0 and 1.0")
-        if self.reason not in ["time_gap", "topic_change", "speaker_pattern", "manual"]:
+        if self.reason not in ["time_gap", "topic_change", "speaker_pattern", "manual", "final_boundary"]:
             raise ValueError(f"Invalid boundary reason: {self.reason}")
 
 

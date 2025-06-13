@@ -522,8 +522,21 @@ class AudioProcessor:
     
     def _update_metadata(self, original: AudioMetadata, processed: AudioSegment) -> AudioMetadata:
         """Update metadata with processed audio information."""
-        # Recalculate volume metrics for processed audio
-        processed_info = self.get_audio_info(Path("dummy"), processed)
+        # Calculate volume metrics directly from processed audio
+        samples = np.array(processed.get_array_of_samples())
+        
+        # RMS calculation for average volume
+        rms = np.sqrt(np.mean(samples**2))
+        avg_volume = 20 * np.log10(rms / 32768.0) if rms > 0 else -100.0
+        
+        # Peak volume
+        peak = np.max(np.abs(samples))
+        peak_volume = 20 * np.log10(peak / 32768.0) if peak > 0 else -100.0
+        
+        # Silence ratio
+        silence_segments = self.detect_silence(processed)
+        total_silence = sum(seg.duration for seg in silence_segments)
+        silence_ratio = total_silence / processed.duration_seconds if processed.duration_seconds > 0 else 0.0
         
         return AudioMetadata(
             duration=processed.duration_seconds,
@@ -531,9 +544,9 @@ class AudioProcessor:
             channels=processed.channels,
             bitrate=original.bitrate,  # Keep original bitrate info
             format=self.output_format,
-            avg_volume=processed_info.avg_volume,
-            peak_volume=processed_info.peak_volume,
-            silence_ratio=processed_info.silence_ratio
+            avg_volume=avg_volume,
+            peak_volume=peak_volume,
+            silence_ratio=silence_ratio
         )
     
     def cleanup(self):

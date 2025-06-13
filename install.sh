@@ -63,11 +63,16 @@ install_system_deps() {
                     python${PYTHON_MAJOR_MINOR}-dev \
                     python${PYTHON_MAJOR_MINOR}-venv \
                     build-essential \
+                    cmake \
+                    pkg-config \
+                    libgoogle-perftools-dev \
                     g++ \
                     gcc \
                     make \
                     libudev-dev \
-                    ffmpeg
+                    ffmpeg \
+                    libsndfile1 \
+                    sox
                 ;;
                 
             dnf|yum)
@@ -75,12 +80,21 @@ install_system_deps() {
                 # Install Python dev headers and build tools
                 print_status "Installing Python development headers and build tools..."
                 sudo $PKG_MANAGER install -y \
-                    python${PYTHON_MAJOR_MINOR/./}-devel \
+                    python3-devel \
+                    python3-pip \
                     gcc \
                     gcc-c++ \
                     make \
+                    cmake \
+                    pkg-config \
+                    gperftools-devel \
                     systemd-devel \
-                    ffmpeg
+                    ffmpeg \
+                    python3-virtualenv \
+                    python3-sentencepiece \
+                    sentencepiece-devel \
+                    libsndfile \
+                    sox
                 ;;
                 
             pacman)
@@ -163,27 +177,43 @@ else
     print_status "Virtual environment already exists ✓"
 fi
 
+# For Fedora/RHEL systems, sentencepiece is installed via system packages
+# For other systems, we'll handle it differently
+
 # Activate virtual environment
 print_status "Activating virtual environment..."
 source venv/bin/activate
 
 # Upgrade pip and essential tools
 print_status "Upgrading pip and build tools..."
-pip install --upgrade pip setuptools wheel
+venv/bin/pip install --upgrade pip setuptools wheel Cython
 
-# Install Python dependencies
-print_status "Installing Python dependencies..."
-pip install -r requirements.txt
+# Install remaining Python dependencies
+print_status "Installing remaining Python dependencies..."
+venv/bin/pip install -r requirements.txt
+
+# Install WhisperX (optional - for advanced transcription with diarization)
+if [[ "$PYTHON_VERSION" == "3.13" ]]; then
+    print_warning "WhisperX is not yet compatible with Python 3.13"
+    print_warning "WhisperX requires Python 3.9-3.12. Using faster-whisper instead."
+    print_warning "To use WhisperX, consider using Python 3.12 or earlier."
+else
+    print_status "Installing WhisperX for advanced transcription..."
+    venv/bin/pip install whisperx || {
+        print_warning "WhisperX installation failed. You can still use faster-whisper."
+        print_warning "This might be due to dependency conflicts."
+    }
+fi
 
 # Install platform-specific dependencies
 if [[ "$OSTYPE" == "darwin"* ]]; then
     print_status "Installing macOS-specific dependencies..."
-    pip install -r requirements-macos.txt
+    venv/bin/pip install -r requirements-macos.txt
 fi
 
 # Download spaCy Spanish language model
 print_status "Downloading Spanish language model for spaCy..."
-python -m spacy download es_core_news_lg
+venv/bin/python -m spacy download es_core_news_lg
 
 # Check for Ollama (for local LLM)
 if ! command -v ollama >/dev/null 2>&1; then
@@ -247,11 +277,11 @@ fi
 print_status "Checking acceleration support..."
 
 # Check for CUDA (NVIDIA GPUs)
-if python -c "import torch; print(torch.cuda.is_available())" 2>/dev/null | grep -q "True"; then
+if venv/bin/python -c "import torch; print(torch.cuda.is_available())" 2>/dev/null | grep -q "True"; then
     print_status "CUDA support detected ✓"
     ACCELERATION="CUDA"
 # Check for MPS (Apple Silicon)
-elif python -c "import torch; print(torch.backends.mps.is_available() if hasattr(torch.backends, 'mps') else False)" 2>/dev/null | grep -q "True"; then
+elif venv/bin/python -c "import torch; print(torch.backends.mps.is_available() if hasattr(torch.backends, 'mps') else False)" 2>/dev/null | grep -q "True"; then
     print_status "Metal Performance Shaders (MPS) support detected ✓"
     ACCELERATION="MPS"
 # Check for ROCm (AMD GPUs) - AI 9 HX370 has integrated graphics
@@ -282,5 +312,10 @@ echo "1. Edit config.yaml with your settings"
 echo "2. If using cloud LLMs, add API keys to .env file"
 echo "3. Activate the virtual environment: source venv/bin/activate"
 echo "4. Run the application: python main.py"
+echo ""
+echo "WhisperX Support:"
+echo "- WhisperX has been installed for better transcription with integrated diarization"
+echo "- To use WhisperX, set 'engine: whisperx' in config.yaml under processing.whisperx"
+echo "- For faster-whisper (default), set 'engine: faster-whisper'"
 echo ""
 print_status "All system dependencies have been installed automatically!"

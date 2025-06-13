@@ -12,13 +12,19 @@ import logging
 from pathlib import Path
 from typing import List, Optional, Dict, Any
 import time
+from datetime import datetime
+
+# Load environment variables from .env file
+from dotenv import load_dotenv
+load_dotenv()
 
 # Import TranscriMatic components
 from src.config.config_manager import ConfigManager, ConfigurationError
-from src.transcription.transcription_engine_with_fallback import TranscriptionEngineWithFallback
+from src.transcription.transcription_factory import create_transcription_engine
 from src.audio.audio_processor import AudioProcessor
 from src.conversation.conversation_segmenter import ConversationSegmenter
 from src.llm.analyzer import LLMAnalyzer
+from src.transfer.file_transfer import FileTransfer
 
 
 class TranscriMaticCLI:
@@ -171,15 +177,24 @@ class TranscriMaticCLI:
         mount_points = [
             Path("/media"),      # Linux
             Path("/mnt"),        # Linux
+            Path("/run/media"),  # Modern Linux (Fedora, etc)
             Path("/Volumes"),    # macOS
         ]
         
         for mount_point in mount_points:
             if mount_point.exists():
                 try:
-                    for path in mount_point.iterdir():
-                        if path.is_dir() and not path.name.startswith('.'):
-                            usb_paths.append(path)
+                    # For /run/media, check user subdirectories
+                    if mount_point.name == "media" and mount_point.parent.name == "run":
+                        for user_dir in mount_point.iterdir():
+                            if user_dir.is_dir():
+                                for path in user_dir.iterdir():
+                                    if path.is_dir() and not path.name.startswith('.'):
+                                        usb_paths.append(path)
+                    else:
+                        for path in mount_point.iterdir():
+                            if path.is_dir() and not path.name.startswith('.'):
+                                usb_paths.append(path)
                 except PermissionError:
                     continue
         
@@ -222,7 +237,7 @@ class TranscriMaticCLI:
             self.logger.info("Initializing transcription pipeline...")
             
             audio_processor = AudioProcessor(config)
-            transcription_engine = TranscriptionEngineWithFallback(config)
+            transcription_engine = create_transcription_engine(config)
             segmenter = ConversationSegmenter(config)
             llm_analyzer = LLMAnalyzer(config)
             
@@ -230,11 +245,20 @@ class TranscriMaticCLI:
             self.logger.info("Step 1: Processing audio file...")
             start_time = time.time()
             
-            if not audio_processor.validate_audio(audio_path):
-                print(f"❌ Invalid audio file: {audio_path}")
-                return False
+            # Create AudioFile object (from transfer module)
+            from src.transfer.data_classes import AudioFile
+            audio_file = AudioFile(
+                source_path=audio_path,
+                destination_path=audio_path,  # same as source when processing directly
+                filename=audio_path.name,
+                size=audio_path.stat().st_size,
+                checksum="",  # not needed for direct processing
+                timestamp=datetime.now(),
+                duration=None,  # will be extracted during processing
+                format=audio_path.suffix[1:].lower()
+            )
             
-            processed_audio = audio_processor.process_audio_file(audio_path)
+            processed_audio = audio_processor.process_audio(audio_file)
             audio_time = time.time() - start_time
             print(f"✓ Audio processed in {audio_time:.2f}s")
             
@@ -252,31 +276,81 @@ class TranscriMaticCLI:
             print(f"  - Speakers: {transcription.speaker_count}")
             print(f"  - Real-time factor: {transcription.processing_time/transcription.duration:.2f}x")
             
-            # Step 3: Conversation segmentation
-            self.logger.info("Step 3: Segmenting conversation...")
-            segments = segmenter.segment_conversation(transcription)
-            print(f"✓ Segmented into {len(segments)} conversation parts")
-            
-            # Step 4: LLM Analysis
-            if config.get("llm.provider"):
-                self.logger.info("Step 4: Analyzing with LLM...")
-                analyses = []
-                for segment in segments:
-                    analysis = llm_analyzer.analyze_conversation(
-                        segment["transcript"], segment
-                    )
-                    analyses.append(analysis)
-                print(f"✓ LLM analysis completed for {len(analyses)} segments")
-            
-            # Step 5: Save results
-            output_dir = Path(config.get("output.transcriptions_dir", "output/transcriptions"))
+            # Save transcription immediately after it's created
+            output_dir = Path(config.get("paths.transcriptions", "~/transcrimatic/transcriptions")).expanduser()
             output_dir.mkdir(parents=True, exist_ok=True)
             
             output_file = output_dir / f"{audio_path.stem}_transcription.json"
             with open(output_file, 'w', encoding='utf-8') as f:
                 json.dump(transcription.to_dict(), f, ensure_ascii=False, indent=2)
             
-            print(f"✅ Results saved to: {output_file}")
+            print(f"💾 Transcription saved to: {output_file}")
+            
+            # Step 3: Conversation segmentation
+            self.logger.info("Step 3: Segmenting conversation...")
+            segmentation_result = segmenter.segment_conversations(transcription)
+            print(f"✓ Segmented into {len(segmentation_result.conversations)} conversation parts")
+            
+            # Save segmentation results
+            segmentation_file = output_dir / f"{audio_path.stem}_segmentation.json"
+            with open(segmentation_file, 'w', encoding='utf-8') as f:
+                segmentation_data = {
+                    "conversations": [
+                        {
+                            "id": conv.id,
+                            "start_time": conv.start_time,
+                            "end_time": conv.end_time,
+                            "duration": conv.duration,
+                            "speakers": conv.speakers,
+                            "speaker_transcript": conv.speaker_transcript,
+                            "topic_summary": conv.topic_summary,
+                            "segment_count": len(conv.segments)
+                        }
+                        for conv in segmentation_result.conversations
+                    ],
+                    "boundaries": [
+                        {
+                            "index": b.index,
+                            "timestamp": b.timestamp,
+                            "reason": b.reason,
+                            "confidence": b.confidence
+                        }
+                        for b in segmentation_result.boundaries
+                    ],
+                    "metadata": segmentation_result.metadata
+                }
+                json.dump(segmentation_data, f, ensure_ascii=False, indent=2)
+            
+            print(f"💾 Segmentation saved to: {segmentation_file}")
+            
+            # Step 4: LLM Analysis (if enabled)
+            analyses = []
+            if config.get("llm.provider"):
+                self.logger.info("Step 4: Analyzing with LLM...")
+                
+                # Save analyses as they complete
+                analysis_dir = Path(config.get("paths.summaries", "~/transcrimatic/summaries")).expanduser()
+                analysis_dir.mkdir(parents=True, exist_ok=True)
+                
+                for i, conversation in enumerate(segmentation_result.conversations):
+                    try:
+                        print(f"  Analyzing conversation {i+1}/{len(segmentation_result.conversations)}...")
+                        analysis = llm_analyzer.analyze_conversation(conversation)
+                        analyses.append(analysis)
+                        
+                        # Save individual analysis
+                        analysis_file = analysis_dir / f"{audio_path.stem}_conversation_{conversation.id}_analysis.json"
+                        with open(analysis_file, 'w', encoding='utf-8') as f:
+                            json.dump(analysis.to_dict(), f, ensure_ascii=False, indent=2)
+                            
+                    except Exception as e:
+                        self.logger.error(f"Failed to analyze conversation {conversation.id}: {e}")
+                        print(f"  ⚠️  Failed to analyze conversation {conversation.id}: {e}")
+                        continue
+                
+                print(f"✓ LLM analysis completed for {len(analyses)}/{len(segmentation_result.conversations)} conversations")
+            
+            print(f"✅ Processing complete for {audio_path.name}")
             
             # Display preview
             print(f"\n📝 Transcription Preview:")
@@ -307,53 +381,73 @@ class TranscriMaticCLI:
         print(f"📱 Found {len(usb_devices)} USB device(s):")
         for i, device in enumerate(usb_devices):
             print(f"  {i+1}. {device}")
+            # Check if this is the configured device
+            device_name = device.name.upper()
+            if config.get("device.identifier", "").upper() in device_name:
+                print(f"  ✓ Matches configured device: {config.get('device.identifier')}")
         
-        # Let user select device or process all
-        if len(usb_devices) == 1:
-            selected_device = usb_devices[0]
-            print(f"\\n🎯 Using device: {selected_device}")
-        else:
-            try:
-                choice = input(f"\\nSelect device (1-{len(usb_devices)}) or 'a' for all: ").strip()
-                if choice.lower() == 'a':
-                    selected_device = None  # Process all
-                else:
-                    idx = int(choice) - 1
-                    selected_device = usb_devices[idx]
-            except (ValueError, IndexError):
-                print("❌ Invalid selection.")
-                return False
+        # Process all detected devices automatically
+        print(f"\n🎯 Processing all {len(usb_devices)} device(s) automatically...")
+        
+        # Initialize file transfer
+        file_transfer = FileTransfer(config)
         
         # Find audio files
         total_processed = 0
         total_successful = 0
         
-        devices_to_process = usb_devices if selected_device is None else [selected_device]
+        devices_to_process = usb_devices  # Process all devices automatically
         
         for device in devices_to_process:
-            print(f"\\n🔍 Scanning {device} for audio files...")
-            audio_files = self.find_audio_files(device)
+            print(f"\\n📤 Transferring files from {device}...")
             
-            if not audio_files:
-                print(f"📭 No audio files found in {device}")
-                continue
-            
-            print(f"🎵 Found {len(audio_files)} audio file(s)")
-            
-            for audio_file in audio_files:
-                total_processed += 1
-                print(f"\\n[{total_processed}] Processing: {audio_file.relative_to(device)}")
+            try:
+                # Transfer new files from device
+                transferred_files = file_transfer.transfer_new_files(device)
                 
-                if self.process_single_file(audio_file, config):
-                    total_successful += 1
+                if not transferred_files:
+                    print(f"📭 No new audio files to transfer from {device}")
+                else:
+                    print(f"✅ Transferred {len(transferred_files)} new file(s)")
+                
+                # Also check for existing files that haven't been transcribed
+                print(f"\\n🔍 Checking for untranscribed files in {config.get('paths.audio_destination')}...")
+                
+                # Get all audio files in destination directory
+                dest_path = Path(config.get('paths.audio_destination')).expanduser()
+                if dest_path.exists():
+                    all_audio_files = []
+                    for ext in file_transfer.supported_formats:
+                        all_audio_files.extend(dest_path.rglob(f"*.{ext}"))
+                        all_audio_files.extend(dest_path.rglob(f"*.{ext.upper()}"))
                     
-                    # Optional: Move processed files
-                    if config.get("transfer.delete_after_transfer", False):
-                        try:
-                            audio_file.unlink()
-                            print(f"🗑️  Deleted: {audio_file}")
-                        except Exception as e:
-                            print(f"⚠️  Could not delete {audio_file}: {e}")
+                    # Check which ones have transcriptions
+                    transcription_dir = Path(config.get('paths.transcriptions', '~/transcrimatic/transcriptions')).expanduser()
+                    files_to_process = []
+                    
+                    for audio_file in all_audio_files:
+                        # Check if transcription exists
+                        transcription_file = transcription_dir / f"{audio_file.stem}_transcription.json"
+                        if not transcription_file.exists():
+                            files_to_process.append(audio_file)
+                    
+                    if files_to_process:
+                        print(f"📋 Found {len(files_to_process)} untranscribed file(s)")
+                        
+                        # Process untranscribed files
+                        for audio_path in files_to_process:
+                            total_processed += 1
+                            print(f"\\n[{total_processed}] Processing: {audio_path.name}")
+                            
+                            if self.process_single_file(audio_path, config):
+                                total_successful += 1
+                    else:
+                        print("✅ All files already transcribed")
+                else:
+                    print(f"⚠️  Destination directory does not exist: {dest_path}")
+                        
+            except Exception as e:
+                print(f"❌ Error transferring files from {device}: {e}")
         
         print(f"\\n📊 Summary: {total_successful}/{total_processed} files processed successfully")
         return total_successful > 0
@@ -396,7 +490,7 @@ class TranscriMaticCLI:
             
             # Test transcription engine
             try:
-                engine = TranscriptionEngineWithFallback(self.config)
+                engine = create_transcription_engine(self.config)
                 print("✅ Transcription engine initialized")
             except Exception as e:
                 print(f"❌ Transcription engine error: {e}")
@@ -425,13 +519,10 @@ class TranscriMaticCLI:
             print("⚠️  Daemon mode not yet implemented. Use --usb for now.")
             return 1
         
-        # No specific action - show help
-        print("\\n❓ No action specified. Use --help for options.")
-        print("\\nQuick start:")
-        print("  --file audio.mp3        Process a specific file")
-        print("  --usb                   Process files from USB devices")
-        print("  --setup-config          Create/update configuration")
-        return 0
+        # No specific action - default to USB processing
+        print("\\n🚀 Starting default USB device processing...")
+        success = self.process_usb_files(self.config)
+        return 0 if success else 1
 
 
 def main():
@@ -462,8 +553,8 @@ Examples:
     parser.add_argument(
         "--config", 
         type=Path, 
-        default=Path("config.json"),
-        help="Configuration file path (default: config.json)"
+        default=Path("config.yaml"),
+        help="Configuration file path (default: config.yaml)"
     )
     parser.add_argument(
         "--setup-config",

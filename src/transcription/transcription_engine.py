@@ -73,8 +73,8 @@ class TranscriptionEngine:
                 model_size,
                 device=device,
                 compute_type=compute_type,
-                cpu_threads=4,
-                num_workers=2
+                cpu_threads=12,
+                num_workers=4
             )
             
             self.logger.info(f"Model loaded successfully on {device}")
