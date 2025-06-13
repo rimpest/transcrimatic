@@ -1,0 +1,234 @@
+🎙️  TranscriMatic - Audio Transcription & Analysis System
+============================================================
+2025-06-11 16:57:03,248 - src.config.config_manager - WARNING - Environment variable GEMINI_API_KEY not found
+2025-06-11 16:57:03,249 - src.config.config_manager - WARNING - Environment variable OPENAI_API_KEY not found
+2025-06-11 16:57:03,249 - src.config.config_manager - WARNING - Environment variable OPENAI_ORG not found
+2025-06-11 16:57:03,249 - src.config.config_manager - INFO - Configuration loaded successfully from config.yaml
+✅ Configuration loaded: config.yaml
+\n🚀 Starting default USB device processing...
+
+🔍 Scanning for USB devices...
+📱 Found 1 USB device(s):
+  1. /run/media/rimpest/IC RECORDER
+
+🎯 Processing all 1 device(s) automatically...
+2025-06-11 16:57:03,250 - src.transfer.file_transfer - INFO - FileTransfer initialized with destination: /home/rimpest/transcrimatic/audio_recordings
+\n📤 Transferring files from /run/media/rimpest/IC RECORDER...
+2025-06-11 16:57:03,255 - src.transfer.file_transfer - INFO - Found 7 audio files on device
+2025-06-11 16:57:03,516 - src.transfer.file_transfer - INFO - 0 new files to transfer
+📭 No new audio files to transfer from /run/media/rimpest/IC RECORDER
+\n🔍 Checking for untranscribed files in /home/rimpest/transcrimatic/audio_recordings...
+📋 Found 7 untranscribed file(s)
+\n[1] Processing: 250610_0927.mp3
+
+🎵 Processing: 250610_0927.mp3
+--------------------------------------------------
+2025-06-11 16:57:03,516 - __main__ - INFO - Initializing transcription pipeline...
+2025-06-11 16:57:03,516 - src.audio.audio_processor - INFO - AudioProcessor initialized with temp dir: /tmp/transcrimatic_audio_rrfiz73r
+2025-06-11 16:57:03,517 - src.transcription.transcription_engine - INFO - Loading faster-whisper model: large-v3 on cpu
+2025-06-11 16:57:05,889 - src.transcription.transcription_engine - INFO - Model loaded successfully on cpu
+2025-06-11 16:57:05,889 - src.conversation.conversation_segmenter - INFO - ConversationSegmenter initialized
+2025-06-11 16:57:05,889 - src.llm.analyzer - INFO - Initialized primary LLM provider: ollama
+2025-06-11 16:57:05,889 - __main__ - INFO - Step 1: Processing audio file...
+2025-06-11 16:57:05,889 - src.audio.audio_processor - INFO - Processing audio file: /home/rimpest/transcrimatic/audio_recordings/2025-06-11/250610_0927.mp3
+2025-06-11 16:57:06,052 - src.audio.audio_processor - INFO - Loaded audio: 0.5s, 44100Hz, 2 channels
+2025-06-11 16:57:06,150 - src.audio.audio_processor - ERROR - Failed to extract audio metadata: [Errno 2] No such file or directory: 'dummy'
+2025-06-11 16:57:06,150 - src.audio.audio_processor - INFO - Audio processing completed in 0.26s
+✓ Audio processed in 0.26s
+2025-06-11 16:57:06,150 - __main__ - INFO - Step 2: Transcribing audio...
+2025-06-11 16:57:06,150 - src.transcription.transcription_engine - INFO - Transcribing chunk 1/1
+2025-06-11 16:57:06,333 - faster_whisper - INFO - Processing audio with duration 00:00.470
+2025-06-11 16:57:06,339 - faster_whisper - INFO - VAD filter removed 00:00.470 of audio
+2025-06-11 16:57:06,340 - src.transcription.transcription_engine - INFO - Transcribed 0 segments from chunk
+2025-06-11 16:57:06,340 - src.transcription.transcription_engine - INFO - Transcription completed in 0.19s
+✓ Transcribed in 0.19s
+  - Language: es
+  - Confidence: 0.0%
+  - Segments: 0
+  - Speakers: 0
+  - Real-time factor: 0.41x
+2025-06-11 16:57:06,340 - __main__ - INFO - Step 3: Segmenting conversation...
+✓ Segmented into 0 conversation parts
+2025-06-11 16:57:06,340 - __main__ - INFO - Step 4: Analyzing with LLM...
+✓ LLM analysis completed for 0 conversations
+✅ Results saved to: /home/rimpest/transcrimatic/transcriptions/250610_0927_transcription.json
+
+📝 Transcription Preview:
+
+\n[2] Processing: 250610_0928.mp3
+
+🎵 Processing: 250610_0928.mp3
+--------------------------------------------------
+2025-06-11 16:57:06,361 - __main__ - INFO - Initializing transcription pipeline...
+2025-06-11 16:57:06,361 - src.audio.audio_processor - INFO - AudioProcessor initialized with temp dir: /tmp/transcrimatic_audio_rv3vs1vo
+2025-06-11 16:57:06,361 - src.transcription.transcription_engine - INFO - Loading faster-whisper model: large-v3 on cpu
+2025-06-11 16:57:08,127 - src.transcription.transcription_engine - INFO - Model loaded successfully on cpu
+2025-06-11 16:57:08,127 - src.conversation.conversation_segmenter - INFO - ConversationSegmenter initialized
+2025-06-11 16:57:08,127 - src.llm.analyzer - INFO - Initialized primary LLM provider: ollama
+2025-06-11 16:57:08,127 - __main__ - INFO - Step 1: Processing audio file...
+2025-06-11 16:57:08,127 - src.audio.audio_processor - INFO - Processing audio file: /home/rimpest/transcrimatic/audio_recordings/2025-06-11/250610_0928.mp3
+2025-06-11 16:57:08,740 - src.audio.audio_processor - INFO - Loaded audio: 651.8s, 44100Hz, 2 channels
+2025-06-11 16:57:10,908 - src.audio.audio_processor - INFO - Audio duration (651.8s) exceeds max chunk duration (300s)
+2025-06-11 16:57:10,970 - src.audio.audio_processor - INFO - Split audio into 3 chunks based on silence
+2025-06-11 16:57:11,366 - src.audio.audio_processor - ERROR - Failed to extract audio metadata: [Errno 2] No such file or directory: 'dummy'
+2025-06-11 16:57:11,366 - src.audio.audio_processor - INFO - Audio processing completed in 3.24s
+✓ Audio processed in 3.24s
+2025-06-11 16:57:11,366 - __main__ - INFO - Step 2: Transcribing audio...
+2025-06-11 16:57:11,366 - src.transcription.transcription_engine - INFO - Transcribing chunk 1/3
+2025-06-11 16:57:11,584 - faster_whisper - INFO - Processing audio with duration 04:56.250
+2025-06-11 16:57:12,186 - faster_whisper - INFO - VAD filter removed 04:49.416 of audio
+2025-06-11 16:57:18,948 - src.transcription.transcription_engine - INFO - Transcribed 5 segments from chunk
+2025-06-11 16:57:18,948 - src.transcription.transcription_engine - INFO - Transcribing chunk 2/3
+2025-06-11 16:57:19,184 - faster_whisper - INFO - Processing audio with duration 05:21.200
+2025-06-11 16:57:19,849 - faster_whisper - INFO - VAD filter removed 04:56.968 of audio
+2025-06-11 16:57:28,903 - src.transcription.transcription_engine - INFO - Transcribed 4 segments from chunk
+2025-06-11 16:57:28,903 - src.transcription.transcription_engine - INFO - Transcribing chunk 3/3
+2025-06-11 16:57:29,114 - faster_whisper - INFO - Processing audio with duration 00:34.357
+2025-06-11 16:57:29,200 - faster_whisper - INFO - VAD filter removed 00:20.437 of audio
+2025-06-11 16:57:34,299 - src.transcription.transcription_engine - INFO - Transcribed 1 segments from chunk
+2025-06-11 16:57:34,299 - src.transcription.transcription_engine - INFO - Transcription completed in 22.93s
+✓ Transcribed in 22.93s
+  - Language: es
+  - Confidence: 71.2%
+  - Segments: 10
+  - Speakers: 1
+  - Real-time factor: 0.04x
+2025-06-11 16:57:34,300 - __main__ - INFO - Step 3: Segmenting conversation...
+2025-06-11 16:57:34,995 - src.conversation.conversation_segmenter - INFO - NLP components initialized successfully
+2025-06-11 16:57:35,011 - src.conversation.conversation_segmenter - INFO - Segmented into 2 conversations in 0.71s
+✓ Segmented into 2 conversation parts
+2025-06-11 16:57:35,012 - __main__ - INFO - Step 4: Analyzing with LLM...
+2025-06-11 16:57:35,012 - __main__ - ERROR - Processing failed: LLMAnalyzer.analyze_conversation() takes 2 positional arguments but 3 were given
+❌ Error processing /home/rimpest/transcrimatic/audio_recordings/2025-06-11/250610_0928.mp3: LLMAnalyzer.analyze_conversation() takes 2 positional arguments but 3 were given
+\n[3] Processing: 250610_1330.mp3
+
+🎵 Processing: 250610_1330.mp3
+--------------------------------------------------
+2025-06-11 16:57:35,012 - __main__ - INFO - Initializing transcription pipeline...
+2025-06-11 16:57:35,012 - src.audio.audio_processor - INFO - AudioProcessor initialized with temp dir: /tmp/transcrimatic_audio_5683a5v6
+2025-06-11 16:57:35,012 - src.transcription.transcription_engine - INFO - Loading faster-whisper model: large-v3 on cpu
+2025-06-11 16:57:36,868 - src.transcription.transcription_engine - INFO - Model loaded successfully on cpu
+2025-06-11 16:57:36,868 - src.conversation.conversation_segmenter - INFO - ConversationSegmenter initialized
+2025-06-11 16:57:36,868 - src.llm.analyzer - INFO - Initialized primary LLM provider: ollama
+2025-06-11 16:57:36,868 - __main__ - INFO - Step 1: Processing audio file...
+2025-06-11 16:57:36,868 - src.audio.audio_processor - INFO - Processing audio file: /home/rimpest/transcrimatic/audio_recordings/2025-06-11/250610_1330.mp3
+2025-06-11 16:57:37,179 - src.audio.audio_processor - INFO - Loaded audio: 203.5s, 44100Hz, 2 channels
+2025-06-11 16:57:37,953 - src.audio.audio_processor - ERROR - Failed to extract audio metadata: [Errno 2] No such file or directory: 'dummy'
+2025-06-11 16:57:37,953 - src.audio.audio_processor - INFO - Audio processing completed in 1.09s
+✓ Audio processed in 1.09s
+2025-06-11 16:57:37,953 - __main__ - INFO - Step 2: Transcribing audio...
+2025-06-11 16:57:37,953 - src.transcription.transcription_engine - INFO - Transcribing chunk 1/1
+2025-06-11 16:57:38,171 - faster_whisper - INFO - Processing audio with duration 03:23.494
+2025-06-11 16:57:38,506 - faster_whisper - INFO - VAD filter removed 01:38.774 of audio
+2025-06-11 16:58:41,674 - src.transcription.transcription_engine - INFO - Transcribed 46 segments from chunk
+2025-06-11 16:58:41,675 - src.transcription.transcription_engine - INFO - Transcription completed in 63.72s
+✓ Transcribed in 63.72s
+  - Language: es
+  - Confidence: 52.4%
+  - Segments: 46
+  - Speakers: 1
+  - Real-time factor: 0.31x
+2025-06-11 16:58:41,675 - __main__ - INFO - Step 3: Segmenting conversation...
+2025-06-11 16:58:42,349 - src.conversation.conversation_segmenter - INFO - NLP components initialized successfully
+2025-06-11 16:58:42,420 - src.conversation.conversation_segmenter - INFO - Segmented into 2 conversations in 0.74s
+✓ Segmented into 2 conversation parts
+2025-06-11 16:58:42,420 - __main__ - INFO - Step 4: Analyzing with LLM...
+2025-06-11 16:58:42,420 - __main__ - ERROR - Processing failed: LLMAnalyzer.analyze_conversation() takes 2 positional arguments but 3 were given
+❌ Error processing /home/rimpest/transcrimatic/audio_recordings/2025-06-11/250610_1330.mp3: LLMAnalyzer.analyze_conversation() takes 2 positional arguments but 3 were given
+\n[4] Processing: 250611_0811.mp3
+
+🎵 Processing: 250611_0811.mp3
+--------------------------------------------------
+2025-06-11 16:58:42,505 - __main__ - INFO - Initializing transcription pipeline...
+2025-06-11 16:58:42,506 - src.audio.audio_processor - INFO - AudioProcessor initialized with temp dir: /tmp/transcrimatic_audio_kj4sxetc
+2025-06-11 16:58:42,507 - src.transcription.transcription_engine - INFO - Loading faster-whisper model: large-v3 on cpu
+2025-06-11 16:58:44,384 - src.transcription.transcription_engine - INFO - Model loaded successfully on cpu
+2025-06-11 16:58:44,384 - src.conversation.conversation_segmenter - INFO - ConversationSegmenter initialized
+2025-06-11 16:58:44,384 - src.llm.analyzer - INFO - Initialized primary LLM provider: ollama
+2025-06-11 16:58:44,384 - __main__ - INFO - Step 1: Processing audio file...
+2025-06-11 16:58:44,384 - src.audio.audio_processor - INFO - Processing audio file: /home/rimpest/transcrimatic/audio_recordings/2025-06-11/250611_0811.mp3
+2025-06-11 16:58:44,744 - src.audio.audio_processor - INFO - Loaded audio: 212.1s, 44100Hz, 2 channels
+2025-06-11 16:58:45,643 - src.audio.audio_processor - ERROR - Failed to extract audio metadata: [Errno 2] No such file or directory: 'dummy'
+2025-06-11 16:58:45,644 - src.audio.audio_processor - INFO - Audio processing completed in 1.26s
+✓ Audio processed in 1.26s
+2025-06-11 16:58:45,644 - __main__ - INFO - Step 2: Transcribing audio...
+2025-06-11 16:58:45,644 - src.transcription.transcription_engine - INFO - Transcribing chunk 1/1
+2025-06-11 16:58:45,884 - faster_whisper - INFO - Processing audio with duration 03:32.062
+2025-06-11 16:58:46,248 - faster_whisper - INFO - VAD filter removed 03:31.598 of audio
+2025-06-11 16:58:51,366 - src.transcription.transcription_engine - INFO - Transcribed 1 segments from chunk
+2025-06-11 16:58:51,366 - src.transcription.transcription_engine - INFO - Transcription completed in 5.72s
+✓ Transcribed in 5.72s
+  - Language: es
+  - Confidence: 37.2%
+  - Segments: 1
+  - Speakers: 1
+  - Real-time factor: 0.03x
+2025-06-11 16:58:51,366 - __main__ - INFO - Step 3: Segmenting conversation...
+2025-06-11 16:58:51,954 - src.conversation.conversation_segmenter - INFO - NLP components initialized successfully
+2025-06-11 16:58:51,957 - src.conversation.conversation_segmenter - INFO - Segmented into 1 conversations in 0.59s
+✓ Segmented into 1 conversation parts
+2025-06-11 16:58:51,957 - __main__ - INFO - Step 4: Analyzing with LLM...
+2025-06-11 16:58:51,957 - __main__ - ERROR - Processing failed: LLMAnalyzer.analyze_conversation() takes 2 positional arguments but 3 were given
+❌ Error processing /home/rimpest/transcrimatic/audio_recordings/2025-06-11/250611_0811.mp3: LLMAnalyzer.analyze_conversation() takes 2 positional arguments but 3 were given
+\n[5] Processing: 250611_0815.mp3
+
+🎵 Processing: 250611_0815.mp3
+--------------------------------------------------
+2025-06-11 16:58:51,983 - __main__ - INFO - Initializing transcription pipeline...
+2025-06-11 16:58:51,985 - src.audio.audio_processor - INFO - AudioProcessor initialized with temp dir: /tmp/transcrimatic_audio_2z_22v9d
+2025-06-11 16:58:51,985 - src.transcription.transcription_engine - INFO - Loading faster-whisper model: large-v3 on cpu
+2025-06-11 16:58:53,606 - src.transcription.transcription_engine - INFO - Model loaded successfully on cpu
+2025-06-11 16:58:53,606 - src.conversation.conversation_segmenter - INFO - ConversationSegmenter initialized
+2025-06-11 16:58:53,606 - src.llm.analyzer - INFO - Initialized primary LLM provider: ollama
+2025-06-11 16:58:53,606 - __main__ - INFO - Step 1: Processing audio file...
+2025-06-11 16:58:53,606 - src.audio.audio_processor - INFO - Processing audio file: /home/rimpest/transcrimatic/audio_recordings/2025-06-11/250611_0815.mp3
+2025-06-11 16:58:53,752 - src.audio.audio_processor - INFO - Loaded audio: 1.0s, 44100Hz, 2 channels
+2025-06-11 16:58:53,847 - src.audio.audio_processor - ERROR - Failed to extract audio metadata: [Errno 2] No such file or directory: 'dummy'
+2025-06-11 16:58:53,847 - src.audio.audio_processor - INFO - Audio processing completed in 0.24s
+✓ Audio processed in 0.24s
+2025-06-11 16:58:53,847 - __main__ - INFO - Step 2: Transcribing audio...
+2025-06-11 16:58:53,847 - src.transcription.transcription_engine - INFO - Transcribing chunk 1/1
+2025-06-11 16:58:54,069 - faster_whisper - INFO - Processing audio with duration 00:01.045
+2025-06-11 16:58:54,072 - faster_whisper - INFO - VAD filter removed 00:01.045 of audio
+2025-06-11 16:58:54,074 - src.transcription.transcription_engine - INFO - Transcribed 0 segments from chunk
+2025-06-11 16:58:54,074 - src.transcription.transcription_engine - INFO - Transcription completed in 0.23s
+✓ Transcribed in 0.23s
+  - Language: es
+  - Confidence: 0.0%
+  - Segments: 0
+  - Speakers: 0
+  - Real-time factor: 0.22x
+2025-06-11 16:58:54,074 - __main__ - INFO - Step 3: Segmenting conversation...
+✓ Segmented into 0 conversation parts
+2025-06-11 16:58:54,074 - __main__ - INFO - Step 4: Analyzing with LLM...
+✓ LLM analysis completed for 0 conversations
+✅ Results saved to: /home/rimpest/transcrimatic/transcriptions/250611_0815_transcription.json
+
+📝 Transcription Preview:
+
+\n[6] Processing: 250611_0835.mp3
+
+🎵 Processing: 250611_0835.mp3
+--------------------------------------------------
+2025-06-11 16:58:54,113 - __main__ - INFO - Initializing transcription pipeline...
+2025-06-11 16:58:54,115 - src.audio.audio_processor - INFO - AudioProcessor initialized with temp dir: /tmp/transcrimatic_audio_pbn_iqhm
+2025-06-11 16:58:54,115 - src.transcription.transcription_engine - INFO - Loading faster-whisper model: large-v3 on cpu
+2025-06-11 16:58:56,013 - src.transcription.transcription_engine - INFO - Model loaded successfully on cpu
+2025-06-11 16:58:56,013 - src.conversation.conversation_segmenter - INFO - ConversationSegmenter initialized
+2025-06-11 16:58:56,013 - src.llm.analyzer - INFO - Initialized primary LLM provider: ollama
+2025-06-11 16:58:56,013 - __main__ - INFO - Step 1: Processing audio file...
+2025-06-11 16:58:56,013 - src.audio.audio_processor - INFO - Processing audio file: /home/rimpest/transcrimatic/audio_recordings/2025-06-11/250611_0835.mp3
+2025-06-11 16:59:08,475 - src.audio.audio_processor - INFO - Loaded audio: 15228.6s, 44100Hz, 2 channels
+2025-06-11 16:59:57,739 - src.audio.audio_processor - INFO - Audio duration (15228.6s) exceeds max chunk duration (300s)
+2025-06-11 16:59:58,942 - src.audio.audio_processor - INFO - Split audio into 60 chunks based on silence
+2025-06-11 17:00:06,790 - src.audio.audio_processor - ERROR - Failed to extract audio metadata: [Errno 2] No such file or directory: 'dummy'
+2025-06-11 17:00:06,791 - src.audio.audio_processor - INFO - Audio processing completed in 70.78s
+✓ Audio processed in 70.79s
+2025-06-11 17:00:06,799 - __main__ - INFO - Step 2: Transcribing audio...
+2025-06-11 17:00:06,800 - src.transcription.transcription_engine - INFO - Transcribing chunk 1/60
+2025-06-11 17:00:07,009 - faster_whisper - INFO - Processing audio with duration 05:07.050
+2025-06-11 17:00:07,524 - faster_whisper - INFO - VAD filter removed 04:47.690 of audio
+2025-06-11 17:00:45,193 - src.transcription.transcription_engine - INFO - Transcribed 23 segments from chunk
+2025-06-11 17:00:45,193 - src.transcription.transcription_engine - INFO - Transcribing chunk 2/60
+2025-06-11 17:00:45,425 - faster_whisper - INFO - Processing audio with duration 04:19.050
+2025-06-11 17:00:45,907 - faster_whisper - INFO - VAD filter removed 01:58.872 of audio
